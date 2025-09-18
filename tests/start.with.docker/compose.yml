@@ -1,7 +1,7 @@
 services:
 
   mcp-files-server:
-    image: k33g/mcp-files-server:0.0.0
+    image: k33g/mcp-files-server:0.0.1
     ports:
       - 9090:6060
     environment:
