@@ -7,8 +7,9 @@ A lightweight HTTP streamable MCP (Model Context Protocol) server implemented in
 The MCP Files Server enables AI assistants and automation tools to safely read and write text files through the standardized MCP protocol. This server provides:
 
 - **Workspace Isolation**: All file operations are contained within a configurable workspace directory via `LOCAL_WORKSPACE_FOLDER`
+- **Path Traversal Protection**: Advanced security validation prevents access outside the workspace folder (blocks `../`, absolute paths, etc.)
 - **Secure File Access**: Proper path validation and cleaning to prevent directory traversal attacks
-- **Simple API**: Four essential tools for file manipulation - read, write, delete, and directory tree operations
+- **Simple API**: Eight essential tools for file manipulation - read, write, delete files, create/delete directories, list directory contents, and tree view operations
 - **HTTP Streaming**: Built on the MCP streamable HTTP protocol for real-time communication
 - **Zero Dependencies**: Minimal external dependencies for easy deployment and maintenance
 
@@ -27,36 +28,88 @@ The MCP Files Server enables AI assistants and automation tools to safely read a
 Reads the content of a text file within the workspace.
 
 **Parameters:**
-- `file_path` (string, required): Relative path to the file within the workspace
+- `file_path` (string, required): Relative path to the file within the workspace (automatically validated for security)
 
 **Returns:** The complete file content as text
+
+**Security:** Path is automatically validated to prevent access outside the workspace folder.
 
 ### `write_file`
 Writes content to a text file within the workspace.
 
 **Parameters:**
-- `file_path` (string, required): Relative path to the file within the workspace
+- `file_path` (string, required): Relative path to the file within the workspace (automatically validated for security)
 - `content` (string, required): Text content to write to the file
 
 **Returns:** Success message with file path and byte count
+
+**Security:** Path is automatically validated to prevent access outside the workspace folder. Directories are created automatically if needed.
 
 ### `delete_file`
 Deletes a file from the filesystem within the workspace.
 
 **Parameters:**
-- `file_path` (string, required): Relative path to the file within the workspace
+- `file_path` (string, required): Relative path to the file within the workspace (automatically validated for security)
 
 **Returns:** Success message confirming file deletion
+
+**Security:** Path is automatically validated to prevent access outside the workspace folder.
+
+### `create_directory`
+Creates a directory and all necessary parent directories within the workspace.
+
+**Parameters:**
+- `directory_path` (string, required): Relative path to the directory to create within the workspace (automatically validated for security)
+
+**Returns:** Success message confirming directory creation
+
+**Security:** Path is automatically validated to prevent access outside the workspace folder. Parent directories are created automatically if needed.
+
+### `delete_directory`
+Deletes a directory and all its contents from the filesystem within the workspace.
+
+**Parameters:**
+- `directory_path` (string, required): Relative path to the directory to delete within the workspace (automatically validated for security)
+
+**Returns:** Success message confirming directory deletion
+
+**Security:** Path is automatically validated to prevent access outside the workspace folder. Includes verification that the path is actually a directory before deletion.
+
+### `list_directory`
+Lists the contents of a directory within the workspace.
+
+**Parameters:**
+- `directory_path` (string, required): Relative path to the directory to list within the workspace (automatically validated for security)
+
+**Returns:** Formatted list of directory contents with file sizes (directories marked with trailing /)
+
+**Security:** Path is automatically validated to prevent access outside the workspace folder. Includes verification that the path is actually a directory.
+
+### `tree_view`
+Displays a tree view of a directory structure within the workspace.
+
+**Parameters:**
+- `directory_path` (string, required): Relative path to the directory to display as tree within the workspace (automatically validated for security)
+- `max_depth` (number, optional): Maximum depth to traverse (default: unlimited)
+
+**Returns:** Formatted tree view with file sizes and proper tree structure characters (directories marked with trailing /)
+
+**Security:** Path is automatically validated to prevent access outside the workspace folder. Includes verification that the path is actually a directory. Depth limiting prevents excessive resource usage.
 
 ## Architecture
 
 The server follows the MCP protocol specification and provides:
 
 1. **Session Management**: Each client connection gets a unique session ID
-2. **Tool Registration**: All four file tools are registered with proper parameter validation
+2. **Tool Registration**: All eight file tools are registered with proper parameter validation
 3. **Error Handling**: Comprehensive error responses for missing files, permissions, etc.
 4. **Health Monitoring**: `/health` endpoint for service monitoring
-5. **Workspace Security**: All file paths are prefixed with `LOCAL_WORKSPACE_FOLDER`
+5. **Workspace Security**: All file paths are validated and contained within `LOCAL_WORKSPACE_FOLDER`
+6. **Path Validation**: Comprehensive protection against directory traversal attacks including:
+   - Resolution of relative path components (`../`, `./`)
+   - Removal of absolute path prefixes (`/`, `\`)
+   - Verification that final resolved paths remain within the workspace
+   - Prevention of symlink-based escapes
 
 
 ## Configuration
