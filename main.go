@@ -46,18 +46,18 @@ func main() {
 	)
 	s.AddTool(writeFileTool, writeFileHandler)
 
-	generateFileTool := mcp.NewTool("generate_file",
-		mcp.WithDescription("Write content to a text file"),
-		mcp.WithString("file_path",
-			mcp.Required(),
-			mcp.Description("Path to the file to write"),
-		),
-		mcp.WithString("content",
-			mcp.Required(),
-			mcp.Description("Content to write to the file"),
-		),
-	)
-	s.AddTool(generateFileTool, writeFileHandler)	
+	// generateFileTool := mcp.NewTool("generate_file",
+	// 	mcp.WithDescription("Write content to a text file"),
+	// 	mcp.WithString("file_path",
+	// 		mcp.Required(),
+	// 		mcp.Description("Path to the file to write"),
+	// 	),
+	// 	mcp.WithString("content",
+	// 		mcp.Required(),
+	// 		mcp.Description("Content to write to the file"),
+	// 	),
+	// )
+	// s.AddTool(generateFileTool, writeFileHandler)	
 
 	// Delete file tool
 	deleteFileTool := mcp.NewTool("delete_file",
