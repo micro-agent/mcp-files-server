@@ -134,7 +134,7 @@ Image: https://hub.docker.com/repository/docker/k33g/mcp-files-server/tags
 services:
 
   mcp-files-server:
-    image: k33g/mcp-files-server:0.0.2
+    image: k33g/mcp-files-server:0.0.3
     ports:
       - 9090:6060
     environment:
